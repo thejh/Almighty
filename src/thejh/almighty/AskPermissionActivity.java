@@ -35,7 +35,6 @@ public class AskPermissionActivity extends DelayedActivity {
 	
 	static {
 		if (!Constants.SETTINGS_DIR.exists()) {
-			// TODO check that this sets good permissions
 			Constants.SETTINGS_DIR.mkdir();
 		}
 	}
