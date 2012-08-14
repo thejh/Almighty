@@ -33,6 +33,7 @@ public class AlmightyActivity extends Activity {
     
     @Override
     public void onResume() {
+    	super.onResume();
     	final ArrayList<AlmightyAppInfo> apps = new ArrayList<AlmightyAppInfo>();
     	PackageManager pm = getPackageManager();
     	

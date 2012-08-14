@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Process;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -22,7 +23,7 @@ import android.widget.TextView;
 /**
  * This activity asks the user whether he wants to grant root access to a
  * specific app. To prevent attacks that ask for permission exactly when
- * the user taps on what was on the screen before, there is a one-second
+ * the user taps on what was on the screen before, there is a three-second
  * safety delay that gets reset whenever the activity loses focus.
  */
 public class AskPermissionActivity extends Activity {
@@ -68,6 +69,7 @@ public class AskPermissionActivity extends Activity {
     
     @Override
     public void onStart() {
+    	super.onStart();
     	Intent i = getIntent();
     	caller_uid = i.getIntExtra(EXTRA_CALLER_UID, -1);
     	if (caller_uid == -1) {
@@ -89,6 +91,7 @@ public class AskPermissionActivity extends Activity {
     
     @Override
     public void onPause() {
+    	super.onPause();
     	if (pbu != null) {
     		synchronized (pbu) {
         		pbu.stop = true;
@@ -99,9 +102,11 @@ public class AskPermissionActivity extends Activity {
     
     @Override
     public void onResume() {
+    	super.onResume();
     	if (pbu != null) throw new RuntimeException("the progressbarupdater can't exist here!");
     	ProgressBar pbar = (ProgressBar) findViewById(R.id.safety_delay_progressbar);
     	pbar.setProgress(0);
+    	pbar.setMax(300);
     	pbu = new ProgressBarUpdater(pbar);
     	pbu.start();
     }
@@ -117,7 +122,7 @@ public class AskPermissionActivity extends Activity {
 
 		@Override
     	public void run() {
-    		while (progress < 100) {
+    		while (progress < 300) {
     			try {Thread.sleep(10);} catch (InterruptedException e) {
     				continue;
     			}
@@ -153,6 +158,7 @@ public class AskPermissionActivity extends Activity {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+    	Log.d("AskPermissionActivity", "sending SIGKILL to "+target_pid+" to signal that a result exists");
     	Process.sendSignal(target_pid, Process.SIGNAL_KILL);
     	finish();
     }

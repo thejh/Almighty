@@ -84,16 +84,20 @@
         android:id="@+id/allow_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textColor="#8b8989"
-        android:text="@string/allow" />
+        android:onClick="allow_clicked"
+        android:text="@string/allow"
+        android:textColor="#8b8989" />
+
     <!-- android:textColor="#006400" -->
 
     <Button
         android:id="@+id/deny_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textColor="#8b8989"
-        android:text="@string/deny" />
+        android:onClick="deny_clicked"
+        android:text="@string/deny"
+        android:textColor="#8b8989" />
+
     <!-- android:textColor="#b22222" -->
 
     <TextView
