@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, AlmightyActivity!</string>
+    <string name="app_name">Almighty</string>
+    <string name="permission_requested">An application has requested root access to your phone. Do you want to allow that?</string>
+    <string name="allow">grant root access</string>
+    <string name="deny">deny root access</string>
+    <string name="requestor">calling app</string>
+    <string name="loading">&#8230;</string>
+    <string name="calling_uid">caller\'s UID</string>
+    <string name="root_requested_explaination">Your choice will be remembered, but you can always change it by opening the Almighty app and toggling the setting.</string>
+    <string name="calling_package">caller\'s package name</string>
+    <string name="permission_description">grants access to internal APIs of the Almighty app</string>
+    <string name="apps_list_explaination">These are the apps which are granted or denied root access permanently. Long-tap on an app to change its state.</string>
+
+</resources>
