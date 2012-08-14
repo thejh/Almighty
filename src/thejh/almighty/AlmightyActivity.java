@@ -19,8 +19,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class AlmightyActivity extends Activity {
+public class AlmightyActivity extends DelayedActivity {
 	private ListView mListView;
+	private boolean elementsClickable = false;
 	
     /** Called when the activity is first created. */
     @Override
@@ -31,10 +32,11 @@ public class AlmightyActivity extends Activity {
         mListView = (ListView) findViewById(R.id.apps_list);
     }
     
+    private ArrayList<AlmightyAppInfo> apps;
     @Override
     public void onResume() {
     	super.onResume();
-    	final ArrayList<AlmightyAppInfo> apps = new ArrayList<AlmightyAppInfo>();
+    	apps = new ArrayList<AlmightyAppInfo>();
     	PackageManager pm = getPackageManager();
     	
     	if (Constants.SETTINGS_DIR.exists()) {
@@ -62,7 +64,7 @@ public class AlmightyActivity extends Activity {
     			v_package.setText(app.getPackageName()+"");
     			v_name.setText(app.getName()+"");
     			
-    			v.setBackgroundColor((app.isAllowed() == AllowedState.ALLOW) ? Color.GREEN : Color.RED);
+    			v.setBackgroundColor(Color.LTGRAY);
     			
     			return v;
     		}
@@ -73,6 +75,7 @@ public class AlmightyActivity extends Activity {
     	mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+				if (!elementsClickable) return false;
 				AlmightyAppInfo app = apps.get(position);
 				app.setAllowed((app.isAllowed() == AllowedState.ALLOW) ? AllowedState.DENY : AllowedState.ALLOW); // toggle
 				v.setBackgroundColor((app.isAllowed() == AllowedState.ALLOW) ? Color.GREEN : Color.RED);
@@ -87,4 +90,17 @@ public class AlmightyActivity extends Activity {
 			}
 		});
     }
+
+	@Override
+	protected void enableSensitiveElements() {
+		elementsClickable = true;
+		for (int i=0; i<mListView.getChildCount(); i++) {
+			mListView.getChildAt(i).setBackgroundColor((apps.get(i).isAllowed() == AllowedState.ALLOW) ? Color.GREEN : Color.RED);
+		}
+	}
+
+	@Override
+	protected void disableSensitiveElements() {
+		elementsClickable = false;
+	}
 }

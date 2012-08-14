@@ -26,12 +26,10 @@ import android.widget.TextView;
  * the user taps on what was on the screen before, there is a three-second
  * safety delay that gets reset whenever the activity loses focus.
  */
-public class AskPermissionActivity extends Activity {
+public class AskPermissionActivity extends DelayedActivity {
 	public static final String EXTRA_CALLER_UID = "uid";
 	public static final String EXTRA_TARGET_PID = "pid";
 	
-	private ProgressBarUpdater pbu = null;
-	private Handler h;
 	private int caller_uid = -1;
 	private int target_pid = -1;
 	
@@ -47,19 +45,6 @@ public class AskPermissionActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ask_permission);
-        h = new Handler();
-    }
-    
-    private void disableButton(int id) {
-    	Button button = (Button) findViewById(id);
-    	button.setEnabled(false);
-    	button.setTextColor(Color.DKGRAY);
-    }
-    
-    private void enableButton(int id, int color) {
-    	Button button = (Button) findViewById(id);
-    	button.setEnabled(true);
-    	button.setTextColor(color);
     }
     
     private void setText(int id, CharSequence text) {
@@ -80,73 +65,10 @@ public class AskPermissionActivity extends Activity {
     		throw new RuntimeException("missing target_pid parameter");
     	}
     	
-    	disableButton(R.id.allow_button);
-    	disableButton(R.id.deny_button);
-    	
     	AlmightyAppInfo appInfo = new AlmightyAppInfo(caller_uid, getPackageManager());
     	setText(R.id.caller_uid, appInfo.getUid()+"");
     	setText(R.id.caller_package, appInfo.getPackageName());
     	setText(R.id.caller_name, appInfo.getName());
-    }
-    
-    @Override
-    public void onPause() {
-    	super.onPause();
-    	if (pbu != null) {
-    		synchronized (pbu) {
-        		pbu.stop = true;
-        		pbu = null;
-			}
-    	}
-    }
-    
-    @Override
-    public void onResume() {
-    	super.onResume();
-    	if (pbu != null) throw new RuntimeException("the progressbarupdater can't exist here!");
-    	ProgressBar pbar = (ProgressBar) findViewById(R.id.safety_delay_progressbar);
-    	pbar.setProgress(0);
-    	pbar.setMax(300);
-    	pbu = new ProgressBarUpdater(pbar);
-    	pbu.start();
-    }
-    
-    class ProgressBarUpdater extends Thread {
-    	boolean stop = false;
-    	private int progress = 0;
-    	private ProgressBar bar;
-    	
-    	public ProgressBarUpdater(ProgressBar pbar) {
-			bar = pbar;
-		}
-
-		@Override
-    	public void run() {
-    		while (progress < 300) {
-    			try {Thread.sleep(10);} catch (InterruptedException e) {
-    				continue;
-    			}
-    			progress++;
-    			synchronized (this) {
-					if (stop) return;
-					h.post(new Runnable() {
-						public void run() {
-							bar.setProgress(progress);
-						}
-					});
-				}
-    		}
-    		
-    		synchronized (this) {
-    			if (stop) return;
-    			h.post(new Runnable() {
-    				public void run() {
-    					enableButton(R.id.allow_button, Color.GREEN);
-    					enableButton(R.id.deny_button, Color.RED);
-    				}
-    			});
-    		}
-    	}
     }
     
     private void terminate_with_result(char result) {
@@ -170,4 +92,16 @@ public class AskPermissionActivity extends Activity {
     public void deny_clicked(View view) {
     	terminate_with_result('D'); // D means "deny"
     }
+
+	@Override
+	protected void enableSensitiveElements() {
+		enableButton(R.id.allow_button, Color.GREEN);
+		enableButton(R.id.deny_button, Color.RED);
+	}
+
+	@Override
+	protected void disableSensitiveElements() {
+    	disableButton(R.id.allow_button);
+    	disableButton(R.id.deny_button);
+	}
 }
