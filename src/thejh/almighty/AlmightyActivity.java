@@ -52,7 +52,7 @@ public class AlmightyActivity extends Activity {
     		@Override
     		public View getView(int position, View convertView, ViewGroup parent) {
     			AlmightyAppInfo app = apps.get(position);
-    			View v = View.inflate(self, R.layout.app_list_item, mListView);
+    			View v = View.inflate(self, R.layout.app_list_item, null);
     			
     			TextView v_uid = (TextView)v.findViewById(R.id.app_uid);
     			TextView v_package = (TextView)v.findViewById(R.id.app_package);
