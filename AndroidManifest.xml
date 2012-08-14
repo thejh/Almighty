@@ -22,6 +22,12 @@
             </intent-filter>
         </activity>
         <activity android:name="AskPermissionActivity" android:permission="thejh.almighty.ALMIGHTY_INTERNAL" android:exported="true"></activity>
+        <receiver android:name="UninstallReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

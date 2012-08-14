@@ -28,7 +28,6 @@ import android.widget.TextView;
 public class AskPermissionActivity extends Activity {
 	public static final String EXTRA_CALLER_UID = "uid";
 	public static final String EXTRA_TARGET_PID = "pid";
-	public static final File SETTINGS_DIR = new File("/data/data/thejh.almighty/uid_ok/");
 	
 	private ProgressBarUpdater pbu = null;
 	private Handler h;
@@ -36,9 +35,9 @@ public class AskPermissionActivity extends Activity {
 	private int target_pid = -1;
 	
 	static {
-		if (!SETTINGS_DIR.exists()) {
+		if (!Constants.SETTINGS_DIR.exists()) {
 			// TODO check that this sets good permissions
-			SETTINGS_DIR.mkdir();
+			Constants.SETTINGS_DIR.mkdir();
 		}
 	}
 	
@@ -146,7 +145,7 @@ public class AskPermissionActivity extends Activity {
     }
     
     private void terminate_with_result(char result) {
-    	File result_file = new File(SETTINGS_DIR, "uid:" + caller_uid);
+    	File result_file = new File(Constants.SETTINGS_DIR, "uid:" + caller_uid);
     	try {
     		FileOutputStream out = new FileOutputStream(result_file);
 			out.write(result);

@@ -20,8 +20,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class AlmightyActivity extends Activity {
-	public static final File SETTINGS_DIR = new File("/data/data/thejh.almighty/uid_ok/");
-	
 	private ListView mListView;
 	
     /** Called when the activity is first created. */
@@ -38,19 +36,12 @@ public class AlmightyActivity extends Activity {
     	final ArrayList<AlmightyAppInfo> apps = new ArrayList<AlmightyAppInfo>();
     	PackageManager pm = getPackageManager();
     	
-    	if (SETTINGS_DIR.exists()) {
-    		String[] files = SETTINGS_DIR.list();
+    	if (Constants.SETTINGS_DIR.exists()) {
+    		String[] files = Constants.SETTINGS_DIR.list();
     		for (String fileName: files) {
     			if (!fileName.startsWith("uid:")) continue;
     			int uid = Integer.parseInt(fileName.substring(4), 10);
-    			try {
-    				FileInputStream in = new FileInputStream(new File(SETTINGS_DIR, fileName));
-    				boolean allowed = in.read() == 'A';
-    				in.close();
-    				apps.add(new AlmightyAppInfo(uid, pm, allowed));
-    			} catch (IOException e) {
-    				throw new RuntimeException(e);
-    			}
+    			apps.add(new AlmightyAppInfo(uid, pm).withAllowed(true));
     		}
     	}
     	
@@ -70,7 +61,7 @@ public class AlmightyActivity extends Activity {
     			v_package.setText(app.getPackageName()+"");
     			v_name.setText(app.getName()+"");
     			
-    			v.setBackgroundColor(app.isAllowed() ? Color.GREEN : Color.RED);
+    			v.setBackgroundColor((app.isAllowed() == AllowedState.ALLOW) ? Color.GREEN : Color.RED);
     			
     			return v;
     		}
@@ -82,11 +73,11 @@ public class AlmightyActivity extends Activity {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
 				AlmightyAppInfo app = apps.get(position);
-				app.setAllowed(!app.isAllowed()); // toggle
-				v.setBackgroundColor(app.isAllowed() ? Color.GREEN : Color.RED);
+				app.setAllowed((app.isAllowed() == AllowedState.ALLOW) ? AllowedState.DENY : AllowedState.ALLOW); // toggle
+				v.setBackgroundColor((app.isAllowed() == AllowedState.ALLOW) ? Color.GREEN : Color.RED);
 				try {
-					FileOutputStream out = new FileOutputStream(new File(SETTINGS_DIR, "uid:"+app.getUid()));
-					out.write(app.isAllowed() ? 'A' : 'D');
+					FileOutputStream out = new FileOutputStream(new File(Constants.SETTINGS_DIR, "uid:"+app.getUid()));
+					out.write((app.isAllowed() == AllowedState.ALLOW) ? 'A' : 'D');
 					out.close();
 				} catch (IOException e) {
 					throw new RuntimeException(e);
